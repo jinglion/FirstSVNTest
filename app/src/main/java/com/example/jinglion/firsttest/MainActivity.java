@@ -81,7 +81,7 @@ public class MainActivity extends AppCompatActivity {
 
         isOpenAPP = true;//设置为真，表示APP已经被打开
 
-        
+
 
 
     }
