@@ -105,6 +105,10 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    /**
+     * 设置是否开机自启动的按钮
+     * @param isCurSetting
+     */
     private void setAutoButtonText(boolean isCurSetting) {
         if (!isCurSetting) {
             mOpenOrNot.setText("已关闭，点击开启");
