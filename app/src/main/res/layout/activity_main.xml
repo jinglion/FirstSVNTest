@@ -10,6 +10,7 @@
         android:layout_height="wrap_content"
         android:text="2001-01-01  01:01:01"/>
     <Button
+        android:id="@+id/id_btn_open_or_not"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="设置是否开关"/>

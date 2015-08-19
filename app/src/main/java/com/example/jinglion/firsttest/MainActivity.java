@@ -2,6 +2,7 @@ package com.example.jinglion.firsttest;
 
 import android.app.Service;
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
@@ -12,6 +13,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.example.jinglion.firsttest.Service.TimeService;
@@ -19,11 +22,14 @@ import com.example.jinglion.firsttest.Service.TimeService.MyBinder;
 
 public class MainActivity extends AppCompatActivity {
     private TextView mCurTime;
+    private Button mOpenOrNot;
     private Intent timeSerIntent;     //跳转至服务意图
     private TimeService timeService;  //系统后台服务
     private String currTime;  //系统当前时间
     private boolean isOpenAPP = false;//判断APP是否正在打开
+    private boolean curSettingIsAutoOpen = false;  //判断当前设置
     private SharedPreferences sp;
+    private SharedPreferences.Editor editor;
 
     private ServiceConnection mTimeConn = new ServiceConnection() {
         //当启动员和Service连接时调用
@@ -75,15 +81,36 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         mCurTime = (TextView) findViewById(R.id.id_cur_time);
+        mOpenOrNot = (Button) findViewById(R.id.id_btn_open_or_not);
+
+        isOpenAPP = true;
+
+        sp = getSharedPreferences("config.txt", Context.MODE_PRIVATE);
+        curSettingIsAutoOpen = sp.getBoolean("isAutoOpenAPP", false);
+        editor = sp.edit();
+        setAutoButtonText(curSettingIsAutoOpen);
 
         timeSerIntent = new Intent(MainActivity.this, TimeService.class);
         bindService(timeSerIntent, mTimeConn, Service.BIND_AUTO_CREATE);//绑定服务
 
-        isOpenAPP = true;//设置为真，表示APP已经被打开
+        mOpenOrNot.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                editor.putBoolean("isAutoOpenAPP", !curSettingIsAutoOpen);
+                editor.commit();
+                curSettingIsAutoOpen = sp.getBoolean("isAutoOpenAPP", false);
+                setAutoButtonText(curSettingIsAutoOpen);
+            }
+        });
 
+    }
 
-
-
+    private void setAutoButtonText(boolean isCurSetting) {
+        if (!isCurSetting) {
+            mOpenOrNot.setText("已关闭，点击开启");
+        } else {
+            mOpenOrNot.setText("已开启，点击关闭");
+        }
     }
 
     @Override
@@ -98,25 +125,4 @@ public class MainActivity extends AppCompatActivity {
         unbindService(mTimeConn);
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
 }
